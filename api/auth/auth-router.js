@@ -6,8 +6,8 @@ const router = require('express').Router();
 const User = require('../user/user-model');
 
 // Middleware
-// uniqueUsername
-// usernameExists
+const uniqueUsername = require('../middleware/unique-username');
+const usernameExists = require('../middleware/username-exists');
 
 const secret = process.env.SECRET || 'the secret';
 
@@ -22,7 +22,7 @@ function generateToken(user) {
   return jwt.sign(payload, secret, options);
 }
 
-router.post('/register', async (req, res) => {
+router.post('/register', uniqueUsername, async (req, res) => {
   
   try {
     const { username, password } = req.body;
@@ -37,7 +37,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', usernameExists, async (req, res) => {
   
   try {
     const { body: { password }, user } = req;
