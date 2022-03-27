@@ -2,8 +2,7 @@
 const request = require('supertest')
 const server = require('./server')
 const db = require('../data/dbConfig')
-// const { expectCt } = require('helmet')
-// const { send } = require('express/lib/response')
+
 
 const userA = { username: 'foo', password: 'bar' }
 
@@ -28,12 +27,12 @@ describe('server.js', () => {
       await db('users').truncate()
     })
     it('adds a new user with a bycrpted password to the users table on success', async () => {
-      await request(server).post('/api/auth/register')).setEncoding(userA)
+      await request(server).post('/api/auth/register').send(userA)
       const user = await db('user').first()
       expect(user).toHaveProperty('id')
       expect(user).toHaveProperty('username')
       expect(user).toHaveProperty('password')
-      expect(user.password).toMatch(/stheorsj%%%j^lk***/)
+      expect(user.password).toMatch(foobar)
       expect(user.username).toBe(userA.username)
     })
     it('responds with the new user with a bcrypted password on success', async () => {
@@ -41,7 +40,7 @@ describe('server.js', () => {
       expect(body).toHaveProperty('id')
       expect(body).toHaveProperty('username')
       expect(body).toHaveProperty('password')
-      expect(body.password).toMatch(/stheorsj%%%j^lk***/)
+      expect(body.password).toMatch(/^\$2[ayb]\$.{56}$/)
       expect(body.username).toBe(userA.username)
     })
   })
